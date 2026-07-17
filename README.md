@@ -3,14 +3,17 @@
 Reconversión de un Mac mini 2014 (RAM soldada a 8GB, sin soporte para Docker 
 Desktop) en un servidor personal self-hosted. Nace como capa de infraestructura 
 para escalar un proyecto existente de análisis de datos 
-([coffee-analytics](link-aquí)), con la idea de sumar más proyectos con el tiempo.
+([coffee-analytics](https://github.com/AlbertQu1/coffee-consumption-analytics)), con la idea de sumar más proyectos con el tiempo.
 
 ## Stack actual
 
 - **n8n** — orquestador de automatizaciones, instalado nativo vía npm (Docker 
   Desktop no es compatible con este hardware)
+  - Workflow activo: sincronización de Google Sheets → Postgres
 - **PostgreSQL 15** — instalado nativo vía Homebrew, base de datos propia
 - **DBeaver** — cliente gráfico para administrar la base de datos
+- **Script de monitoreo de sistema** — captura métricas de hardware cada 15 
+  min vía `launchd`, guardadas en Postgres
 
 Eso es todo lo que corre hoy — el proyecto está en etapa temprana.
 
@@ -40,6 +43,14 @@ de forma permanente (equipo headless). Para conectarse desde Windows fue
 necesario habilitar explícitamente "VNC viewers may control screen" en la 
 configuración de Screen Sharing, ya que por default macOS solo acepta 
 conexiones remotas desde otra Mac. Probado y funcionando con RealVNC Viewer.
+
+**Script de monitoreo de temperatura**
+**Script de monitoreo de temperatura**
+Script bash que captura temperatura (die + proximity), RPM del ventilador, 
+uso de CPU, RAM libre, espacio en disco, uptime y proceso top cada 15 
+minutos, guardándolo en Postgres (base `casa`, esquema `mac_metrics`). 
+Automatizado con `launchd`.
+([ver script](https://github.com/AlbertQu1/Homelab/blob/main/scripts/com.albertqu.monitor-mac.plist))
 
 ## Roadmap
 
