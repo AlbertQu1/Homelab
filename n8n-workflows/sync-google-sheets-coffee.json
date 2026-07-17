@@ -1,0 +1,1015 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 30
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -352,
+        -320
+      ],
+      "id": "39280a5c-ac57-4b6c-878a-e16dd9b7db1b",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tabla",
+          "mode": "list",
+          "cachedResultName": "tabla"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "folio_sheet": "={{ $json.folio_sheet }}",
+            "cafe_g": "={{ $json.cafe_g }}",
+            "cucharadas": "={{ $json.cucharadas }}",
+            "tipo_bebida": "={{ $json.tipo_bebida }}"
+          },
+          "matchingColumns": [
+            "folio_sheet"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "folio_sheet",
+              "displayName": "folio_sheet",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "tipo_bebida",
+              "displayName": "tipo_bebida",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cafe_g",
+              "displayName": "cafe_g",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cucharadas",
+              "displayName": "cucharadas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        400,
+        -32
+      ],
+      "id": "011a38c1-a0b5-4e72-94f5-16317f18dd45",
+      "name": "Insert or update rows in a table4",
+      "credentials": {
+        "postgres": {
+          "id": "NchR3w7FsDWTUBQK",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "mtto",
+          "mode": "list",
+          "cachedResultName": "mtto"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "folio_sheet": "={{ $json.folio_sheet }}",
+            "tazas": "={{ $json.tazas }}",
+            "mantenimiento": "={{ $json.mantenimiento }}",
+            "fecha": "={{ $json.fecha }}"
+          },
+          "matchingColumns": [
+            "folio_sheet"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "folio_sheet",
+              "displayName": "folio_sheet",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "fecha",
+              "displayName": "fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mantenimiento",
+              "displayName": "mantenimiento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "tazas",
+              "displayName": "tazas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        480,
+        -176
+      ],
+      "id": "58b5054a-68d5-4d9d-8764-2a1cb704e342",
+      "name": "Insert or update rows in a table3",
+      "credentials": {
+        "postgres": {
+          "id": "NchR3w7FsDWTUBQK",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "merma",
+          "mode": "list",
+          "cachedResultName": "merma"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "folio_sheet": "={{ $json.folio_sheet }}",
+            "perdida": "={{ $json.perdida }}",
+            "cafe": "={{ $json.cafe }}",
+            "fecha": "={{ $json.fecha }}"
+          },
+          "matchingColumns": [
+            "folio_sheet"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "folio_sheet",
+              "displayName": "folio_sheet",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "cafe",
+              "displayName": "cafe",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "fecha",
+              "displayName": "fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "perdida",
+              "displayName": "perdida",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        512,
+        -288
+      ],
+      "id": "6bd7f29f-68c6-4d5a-9c5a-37044b64d361",
+      "name": "Insert or update rows in a table2",
+      "credentials": {
+        "postgres": {
+          "id": "NchR3w7FsDWTUBQK",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "cafeterias",
+          "mode": "list",
+          "cachedResultName": "cafeterias"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "folio_sheet": "={{ $json.folio_sheet }}",
+            "anio": "={{ $json.anio }}",
+            "precio": "={{ $json.precio }}",
+            "cafeteria": "={{ $json.cafeteria }}"
+          },
+          "matchingColumns": [
+            "folio_sheet"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "folio_sheet",
+              "displayName": "folio_sheet",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "anio",
+              "displayName": "anio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "cafeteria",
+              "displayName": "cafeteria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "precio",
+              "displayName": "precio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        496,
+        -416
+      ],
+      "id": "3489a70b-10e7-4514-a2b4-1e860860d866",
+      "name": "Insert or update rows in a table1",
+      "credentials": {
+        "postgres": {
+          "id": "NchR3w7FsDWTUBQK",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "cafe",
+          "mode": "list",
+          "cachedResultName": "cafe"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "folio_sheet": "={{ $json.folio_sheet }}",
+            "gramos": "={{ $json.gramos }}",
+            "costo": "={{ $json.costo }}",
+            "espresso": "={{ $json.espresso }}",
+            "quad": "={{ $json.quad }}",
+            "oz6": "={{ $json.oz6 }}",
+            "oz8": "={{ $json.oz8 }}",
+            "oz10": "={{ $json.oz10 }}",
+            "oz12": "={{ $json.oz12 }}",
+            "oz14": "={{ $json.oz14 }}",
+            "oz16": "={{ $json.oz16 }}",
+            "oz18": "={{ $json.oz18 }}",
+            "num_tazas": "={{ $json.num_tazas }}",
+            "cafe": "={{ $json.cafe }}",
+            "ciudad_compra": "={{ $json.ciudad_compra }}",
+            "cierre": "={{ $json.cierre }}",
+            "fecha": "={{ $json.fecha }}"
+          },
+          "matchingColumns": [
+            "folio_sheet"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "folio_sheet",
+              "displayName": "folio_sheet",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "cafe",
+              "displayName": "cafe",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "gramos",
+              "displayName": "gramos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "costo",
+              "displayName": "costo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "espresso",
+              "displayName": "espresso",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "quad",
+              "displayName": "quad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "oz6",
+              "displayName": "oz6",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "oz8",
+              "displayName": "oz8",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "oz10",
+              "displayName": "oz10",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "oz12",
+              "displayName": "oz12",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "oz14",
+              "displayName": "oz14",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "oz16",
+              "displayName": "oz16",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "oz18",
+              "displayName": "oz18",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "num_tazas",
+              "displayName": "num_tazas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "fecha",
+              "displayName": "fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "cierre",
+              "displayName": "cierre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "ciudad_compra",
+              "displayName": "ciudad_compra",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        400,
+        -544
+      ],
+      "id": "7c51ee7d-0a94-469f-b074-e27c49b87fba",
+      "name": "Insert or update rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "NchR3w7FsDWTUBQK",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const csvText = $input.first().json.data;\nconst lines = csvText.trim().split('\\n');\n\nfunction parsearLineaCSV(linea) {\n  const resultado = [];\n  let actual = '';\n  let dentroDeComillas = false;\n  for (let i = 0; i < linea.length; i++) {\n    const char = linea[i];\n    if (char === '\"') { dentroDeComillas = !dentroDeComillas; }\n    else if (char === ',' && !dentroDeComillas) { resultado.push(actual); actual = ''; }\n    else { actual += char; }\n  }\n  resultado.push(actual);\n  return resultado;\n}\n\nconst rows = lines.slice(1)\n  .filter(line => line.trim() !== '')\n  .map(line => {\n    const v = parsearLineaCSV(line);\n    return {\n      folio_sheet: parseInt(v[0]) || null,\n      tipo_bebida: v[1]?.trim() || null,\n      cafe_g: parseFloat(v[2]) || 0,\n      cucharadas: parseFloat(v[3]) || 0\n    };\n  });\n\nreturn rows.map(r => ({ json: r }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        -32
+      ],
+      "id": "8d345991-aff6-4f89-9e6d-ff8cbbda8214",
+      "name": "Code in JavaScript5"
+    },
+    {
+      "parameters": {
+        "jsCode": "const csvText = $input.first().json.data;\nconst lines = csvText.trim().split('\\n');\n\nfunction parsearLineaCSV(linea) {\n  const resultado = [];\n  let actual = '';\n  let dentroDeComillas = false;\n  for (let i = 0; i < linea.length; i++) {\n    const char = linea[i];\n    if (char === '\"') { dentroDeComillas = !dentroDeComillas; }\n    else if (char === ',' && !dentroDeComillas) { resultado.push(actual); actual = ''; }\n    else { actual += char; }\n  }\n  resultado.push(actual);\n  return resultado;\n}\n\nfunction convertirFecha(fechaStr) {\n  if (!fechaStr || fechaStr.trim() === '') return null;\n  const valor = fechaStr.trim();\n  if (/^\\d{4}-\\d{2}-\\d{2}$/.test(valor)) return valor;\n  const partes = valor.split('/');\n  if (partes.length !== 3) return null;\n  let [dia, mes, anio] = partes;\n  if (anio.length === 2) anio = '20' + anio;\n  return `${anio}-${mes.padStart(2,'0')}-${dia.padStart(2,'0')}`;\n}\n\nconst rows = lines.slice(1)\n  .filter(line => line.trim() !== '')\n  .map(line => {\n    const v = parsearLineaCSV(line);\n    return {\n      folio_sheet: parseInt(v[0]) || null,\n      fecha: convertirFecha(v[1]),\n      mantenimiento: v[2]?.trim() || null,\n      tazas: parseInt(v[3]) || 0\n    };\n  });\n\nreturn rows.map(r => ({ json: r }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        -176
+      ],
+      "id": "68cee744-1c69-4e9c-aa77-727d6a970209",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const csvText = $input.first().json.data;\nconst lines = csvText.trim().split('\\n');\n\nfunction parsearLineaCSV(linea) {\n  const resultado = [];\n  let actual = '';\n  let dentroDeComillas = false;\n  for (let i = 0; i < linea.length; i++) {\n    const char = linea[i];\n    if (char === '\"') { dentroDeComillas = !dentroDeComillas; }\n    else if (char === ',' && !dentroDeComillas) { resultado.push(actual); actual = ''; }\n    else { actual += char; }\n  }\n  resultado.push(actual);\n  return resultado;\n}\n\nfunction convertirFecha(fechaStr) {\n  if (!fechaStr || fechaStr.trim() === '') return null;\n  const valor = fechaStr.trim();\n  if (/^\\d{4}-\\d{2}-\\d{2}$/.test(valor)) return valor;\n  const partes = valor.split('/');\n  if (partes.length !== 3) return null;\n  let [dia, mes, anio] = partes;\n  if (anio.length === 2) anio = '20' + anio;\n  return `${anio}-${mes.padStart(2,'0')}-${dia.padStart(2,'0')}`;\n}\n\nconst rows = lines.slice(1)\n  .filter(line => line.trim() !== '')\n  .map(line => {\n    const v = parsearLineaCSV(line);\n    return {\n      folio_sheet: parseInt(v[0]) || null,\n      cafe: v[1]?.trim() || null,\n      fecha: convertirFecha(v[2]),\n      perdida: parseFloat(v[3]) || 0\n    };\n  });\n\nreturn rows.map(r => ({ json: r }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        -288
+      ],
+      "id": "98074a6e-3c43-4836-82f5-4a049a0da077",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const csvText = $input.first().json.data;\nconst lines = csvText.trim().split('\\n');\n\nfunction parsearLineaCSV(linea) {\n  const resultado = [];\n  let actual = '';\n  let dentroDeComillas = false;\n  for (let i = 0; i < linea.length; i++) {\n    const char = linea[i];\n    if (char === '\"') { dentroDeComillas = !dentroDeComillas; }\n    else if (char === ',' && !dentroDeComillas) { resultado.push(actual); actual = ''; }\n    else { actual += char; }\n  }\n  resultado.push(actual);\n  return resultado;\n}\n\nconst rows = lines.slice(1)\n  .filter(line => line.trim() !== '')\n  .map(line => {\n    const v = parsearLineaCSV(line);\n    return {\n      folio_sheet: parseInt(v[0]) || null,\n      anio: parseInt(v[1]) || null,\n      cafeteria: v[2]?.trim() || null,\n      precio: parseFloat(v[3]) || 0\n    };\n  });\n\nreturn rows.map(r => ({ json: r }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        -416
+      ],
+      "id": "9d7de23a-c82f-4000-a89f-fb6258b336c0",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Code in JavaScript1').item.json.nombre }}",
+                    "rightValue": "=cafe",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "7c879ec5-2f73-4e59-850c-90a28a56a098"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "cafe"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "15092414-f307-4736-983c-871e493723c0",
+                    "leftValue": "={{ $('Code in JavaScript1').item.json.nombre }}",
+                    "rightValue": "cafeterias",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "cafeteria"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c54a9700-8a73-4ddc-b925-f60ba261eb7a",
+                    "leftValue": "={{ $('Code in JavaScript1').item.json.nombre }}",
+                    "rightValue": "merma",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "merma"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "42758289-3aa4-47c2-b36c-f7e93148f439",
+                    "leftValue": "={{ $('Code in JavaScript1').item.json.nombre }}",
+                    "rightValue": "mtto",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "mtto"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0621c30d-1ad6-441e-bb8b-8a4eeecd1394",
+                    "leftValue": "={{ $('Code in JavaScript1').item.json.nombre }}",
+                    "rightValue": "tabla",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "tabla"
+            }
+          ]
+        },
+        "looseTypeValidation": "",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        128,
+        -320
+      ],
+      "id": "ee97683a-c7c5-4e98-9d82-2df74f1a0496",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  { json: { nombre: 'cafe', gid: '0' } },\n  { json: { nombre: 'cafeterias', gid: '49728846' } },\n  { json: { nombre: 'merma', gid: '1861632685' } },\n  { json: { nombre: 'mtto', gid: '1040593728' } },\n  { json: { nombre: 'tabla', gid: '1827085190' } },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -176,
+        -320
+      ],
+      "id": "82be2b60-af2c-46ec-8c79-fa37cb390f8f",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const csvText = $input.first().json.data;\nconst lines = csvText.trim().split('\\n');\n\nfunction parsearLineaCSV(linea) {\n  const resultado = [];\n  let actual = '';\n  let dentroDeComillas = false;\n  for (let i = 0; i < linea.length; i++) {\n    const char = linea[i];\n    if (char === '\"') { dentroDeComillas = !dentroDeComillas; }\n    else if (char === ',' && !dentroDeComillas) { resultado.push(actual); actual = ''; }\n    else { actual += char; }\n  }\n  resultado.push(actual);\n  return resultado;\n}\n\nfunction convertirFecha(fechaStr) {\n  if (!fechaStr || fechaStr.trim() === '') return null;\n  const valor = fechaStr.trim();\n  if (/^\\d{4}-\\d{2}-\\d{2}$/.test(valor)) return valor;\n  const partes = valor.split('/');\n  if (partes.length !== 3) return null;\n  let [dia, mes, anio] = partes;\n  if (anio.length === 2) anio = '20' + anio;\n  return `${anio}-${mes.padStart(2,'0')}-${dia.padStart(2,'0')}`;\n}\n\nconst rows = lines.slice(1)\n  .filter(line => line.trim() !== '')\n  .map(line => {\n    const v = parsearLineaCSV(line);\n    return {\n      folio_sheet: parseInt(v[0]) || null,\n      cafe: v[1]?.trim() || null,\n      gramos: parseInt(v[2]) || 0,\n      costo: parseFloat(v[3]) || 0,\n      espresso: parseInt(v[4]) || 0,\n      quad: parseInt(v[5]) || 0,\n      oz6: parseInt(v[6]) || 0,\n      oz8: parseInt(v[7]) || 0,\n      oz10: parseInt(v[8]) || 0,\n      oz12: parseInt(v[9]) || 0,\n      oz14: parseInt(v[10]) || 0,\n      oz16: parseInt(v[11]) || 0,\n      oz18: parseInt(v[12]) || 0,\n      num_tazas: parseInt(v[13]) || 0,\n      fecha: convertirFecha(v[14]),\n      cierre: convertirFecha(v[15]),\n      ciudad_compra: v[16]?.trim() || null\n    };\n  });\n\nreturn rows.map(r => ({ json: r }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        256,
+        -544
+      ],
+      "id": "996981a9-3583-4972-a269-528876fe7105",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "url": "=https://docs.google.com/spreadsheets/d/10AURqoaMgos31R2Vav0Wmjoa3Gy-HIV0ZGtwV8_UUDg/gviz/tq?tqx=out:csv&gid={{ $json.gid }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -32,
+        -320
+      ],
+      "id": "7022702f-5e7e-41b7-9409-e8b9f5b4fb98",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript5": {
+      "main": [
+        [
+          {
+            "node": "Insert or update rows in a table4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        [
+          {
+            "node": "Insert or update rows in a table3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "Insert or update rows in a table2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Insert or update rows in a table1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Insert or update rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "b1a5d948-bd4b-4e1e-94fc-4d03144115dd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cd3ff80feee4a614d7f54fbf528669e557a334f303b42a686c6075891032e202"
+  },
+  "nodeGroups": [],
+  "id": "J7TqtTQY61z4Idbo",
+  "tags": []
+}
