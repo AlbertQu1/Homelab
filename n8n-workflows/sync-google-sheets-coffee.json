@@ -1,5 +1,5 @@
 {
-  "name": "My workflow",
+  "name": "Coffee Analitics CSV",
   "nodes": [
     {
       "parameters": {
@@ -26,8 +26,9 @@
         "operation": "upsert",
         "schema": {
           "__rl": true,
+          "value": "coffee_analytics",
           "mode": "list",
-          "value": "public"
+          "cachedResultName": "coffee_analytics"
         },
         "table": {
           "__rl": true,
@@ -120,8 +121,9 @@
         "operation": "upsert",
         "schema": {
           "__rl": true,
+          "value": "coffee_analytics",
           "mode": "list",
-          "value": "public"
+          "cachedResultName": "coffee_analytics"
         },
         "table": {
           "__rl": true,
@@ -214,8 +216,9 @@
         "operation": "upsert",
         "schema": {
           "__rl": true,
+          "value": "coffee_analytics",
           "mode": "list",
-          "value": "public"
+          "cachedResultName": "coffee_analytics"
         },
         "table": {
           "__rl": true,
@@ -308,8 +311,9 @@
         "operation": "upsert",
         "schema": {
           "__rl": true,
+          "value": "coffee_analytics",
           "mode": "list",
-          "value": "public"
+          "cachedResultName": "coffee_analytics"
         },
         "table": {
           "__rl": true,
@@ -402,8 +406,9 @@
         "operation": "upsert",
         "schema": {
           "__rl": true,
+          "value": "coffee_analytics",
           "mode": "list",
-          "value": "public"
+          "cachedResultName": "coffee_analytics"
         },
         "table": {
           "__rl": true,
@@ -1004,7 +1009,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "b1a5d948-bd4b-4e1e-94fc-4d03144115dd",
+  "versionId": "f8dbf3dc-b696-44c8-86eb-e06043bb84ba",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "cd3ff80feee4a614d7f54fbf528669e557a334f303b42a686c6075891032e202"

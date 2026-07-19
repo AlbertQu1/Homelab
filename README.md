@@ -10,10 +10,14 @@ para escalar un proyecto existente de análisis de datos
 - **n8n** — orquestador de automatizaciones, instalado nativo vía npm (Docker 
   Desktop no es compatible con este hardware)
   - Workflow activo: sincronización de Google Sheets → Postgres
-- **PostgreSQL 15** — instalado nativo vía Homebrew, base de datos propia
+- **PostgreSQL 15** — instalado nativo vía Homebrew, base de datos propia, 
+  configurado para aceptar conexiones desde la red local.
 - **DBeaver** — cliente gráfico para administrar la base de datos
 - **Script de monitoreo de sistema** — captura métricas de hardware cada 15 
   min vía `launchd`, guardadas en Postgres
+  - **Script de análisis (Python)** — corre en la máquina de trabajo (no en el 
+  servidor), entorno de conda dedicado, lee de Postgres vía red local para 
+  generar estadísticas y gráficas de las métricas capturadas
 
 Eso es todo lo que corre hoy — el proyecto está en etapa temprana.
 
@@ -29,7 +33,10 @@ Base de datos creada y funcionando, con una tabla pequeña de prueba.
 
 **Primera automatización en n8n**
 Workflow que obtiene un CSV desde Google Sheets (vía endpoint `gviz/tq`) como 
-primer paso hacia migrar datos del Sheet de café a Postgres.
+primer paso hacia migrar datos del Sheet de café a Postgres. 
+(La credencial de conexión se actualizó tras el renombrado de la base a 
+`casa`; el nodo apunta al esquema `coffee_analytics` dentro de ella.)
+([ver workflow](n8n-workflows/sync-google-sheets-coffee.json))
 
 **Verificación de zona horaria**
 Se confirmó que al correr n8n nativo (no en Docker), el proceso hereda 
@@ -45,12 +52,37 @@ configuración de Screen Sharing, ya que por default macOS solo acepta
 conexiones remotas desde otra Mac. Probado y funcionando con RealVNC Viewer.
 
 **Script de monitoreo de temperatura**
-**Script de monitoreo de temperatura**
 Script bash que captura temperatura (die + proximity), RPM del ventilador, 
 uso de CPU, RAM libre, espacio en disco, uptime y proceso top cada 15 
 minutos, guardándolo en Postgres (base `casa`, esquema `mac_metrics`). 
 Automatizado con `launchd`.
 ([ver script](https://github.com/AlbertQu1/Homelab/blob/main/scripts/com.albertqu.monitor-mac.plist))
+
+**Postgres accesible desde la red local**
+Configurado `listen_addresses` y `pg_hba.conf` para aceptar conexiones desde 
+dispositivos dentro de la red local (antes solo aceptaba conexiones locales 
+al Mac mini). Esto permite que proyectos de análisis de datos (ej. 
+procesamiento en Python/pandas) corran en otra máquina de trabajo, mientras 
+el servidor centraliza únicamente los datos. Acceso restringido al rango de la red local (`192.168.0.0/24`) vía 
+`pg_hba.conf`, no expuesto a internet.
+
+**Renombrado de base de datos a `casa`**
+La base originalmente creada como `coffee_analytics` se renombró a `casa`, 
+reorganizando el contenido de café bajo un esquema propio 
+(`coffee_analytics`) dentro de ella. La idea es centralizar en una sola 
+base de datos distintos proyectos del hogar (café, métricas del servidor, 
+y futuros: clima, automatización) que eventualmente podrían cruzarse en 
+una misma consulta — separados por esquema, no por base de datos.
+
+**Script de análisis en Python (motor de análisis)**
+Script en Python (`analysis/monitor.py`), corriendo en un entorno de conda 
+separado (`mac-metrics`) desde la máquina de trabajo, no en el servidor. 
+Se conecta a Postgres vía red local, calcula la diferencia entre los dos 
+sensores de temperatura (die y proximity) como indicador de confiabilidad 
+de la lectura, genera resumen estadístico y grafica la tendencia. 
+Las credenciales se manejan vía variables de entorno, nunca hardcodeadas 
+en el código.
+([ver script](analysis/monitor.py))
 
 ## Roadmap
 
@@ -59,3 +91,11 @@ Automatizado con `launchd`.
 - [ ] Levantar Home Assistant en este mismo servidor
 - [ ] Configurar Tailscale para acceso remoto seguro (Screen Sharing/SSH desde 
   fuera de la red local, sin exponer puertos directos a internet)
+- [ ] Reinicio semanal programado (apagado lunes 4am, encendido automático 
+  6am vía `pmset`) como mantenimiento preventivo
+- [ ] Respaldo de fotos: disco duro externo + HDD interno Mac mini + OneDrive 
+  (3 copias), organización por año/subcarpetas + enriquecimiento de metadata 
+  con exiftool
+- [ ] Respaldo de biblioteca musical de iTunes: disco duro externo + HDD 
+  interno Mac mini (2 copias, sin nube)
+- [ ] Backup automatizado de Postgres (`pg_dump`) hacia OneDrive
