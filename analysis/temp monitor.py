@@ -2,6 +2,9 @@ import psycopg2
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
+from dotenv import load_dotenv
+
+load_dotenv()
 
 DB_CONFIG = {
     "host": os.environ.get("POSTGRES_HOST"),
@@ -12,14 +15,21 @@ DB_CONFIG = {
 }
 
 UMBRAL_ALERTA = 65  # °C
+MOSTRAR_GRAFICOS = False
 
 
 def conectar():
-    return psycopg2.connect(**DB_CONFIG)
-
+    try:
+        return psycopg2.connect(**DB_CONFIG)
+    except psycopg2.OperationalError:
+        return None
 
 def ver_ultima_lectura():
     conn = conectar()
+    if conn is None:
+        print("\n🔌 Servidor desconectado")
+        return
+    
     cur = conn.cursor()
     cur.execute("""
         SELECT temperatura_die_c, temperatura_proximity_c, fan_rpm, cpu_uso_pct, registro
@@ -55,6 +65,10 @@ def ver_ultima_lectura():
 
 def ver_historial():
     conn = conectar()
+    if conn is None:
+        print("\n🔌 Servidor desconectado")
+        return None
+
     df = pd.read_sql(
         """
         SELECT temperatura_die_c, temperatura_proximity_c, fan_rpm, cpu_uso_pct, registro
@@ -72,7 +86,7 @@ def ver_historial():
 
 
 def resumen_estadistico(df):
-    print("\n--- Resumen estadístico ---")
+    print("\n--- Resumen estadístico global ---")
     print(
         f"Temp die   -> min: {df['temperatura_die_c'].min()}°C | max: {df['temperatura_die_c'].max()}°C | promedio: {df['temperatura_die_c'].mean():.2f}°C"
     )
@@ -83,8 +97,26 @@ def resumen_estadistico(df):
         f"Fan RPM    -> min: {df['fan_rpm'].min()} | max: {df['fan_rpm'].max()} | promedio: {df['fan_rpm'].mean():.0f}"
     )
 
+def resumen_por_dia(df):
+    df["fecha"] = df["registro"].dt.date
+
+    resumen =df.groupby("fecha").agg(
+        temp_die_min=("temperatura_die_c", "min"),
+        temp_die_max=("temperatura_die_c", "max"),
+        temp_die_promedio=("temperatura_die_c", "mean"),
+        diferencia_promedio=("diferencia", "mean"),
+        fan_promedio=("fan_rpm", "mean"),
+        lecturas=("temperatura_die_c", "count"),
+    ).round(2)
+
+    print("\n--- Resumen por día ---")
+    print(resumen.to_string())
 
 def graficar(df):
+    if not MOSTRAR_GRAFICOS:
+        print("\n📊 Gráficos: OFF")
+        return
+    
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
 
     # --- Gráfica 1: temperaturas ---
@@ -119,6 +151,8 @@ def graficar(df):
 if __name__ == "__main__":
     ver_ultima_lectura()
     df = ver_historial()
-    print(f"\nTotal de lecturas registradas: {len(df)}")
-    resumen_estadistico(df)
-    graficar(df)
+    if df is not None:
+        print(f"\nTotal de lecturas registradas: {len(df)}")
+        resumen_estadistico(df)
+        resumen_por_dia(df)
+        graficar(df)
