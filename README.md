@@ -84,6 +84,41 @@ Las credenciales se manejan vía variables de entorno, nunca hardcodeadas
 en el código.
 ([ver script](analysis/monitor.py))
 
+**Migracion de Postgres y script de monitoreo a LaunchDaemons**
+Postgres y el script de monitoreo de temperatura se movieron de LaunchAgents 
+(dependientes de sesion de usuario) a LaunchDaemons (nivel de sistema), para 
+que arranquen automaticamente al iniciar el Mac mini sin necesitar conexion 
+por SSH o sesion grafica. n8n se deja pendiente de este cambio, ya que se 
+esta evaluando migrarlo a Colima/contenedores antes de automatizar su arranque.
+
+**Bitacora de escenarios de prueba**
+Se creo la tabla `mac_metrics.pruebas` para registrar manualmente el contexto 
+de cada prueba de temperatura (que app se abrio, a que hora). Se agrego 
+`analysis/registro.py`, que permite insertar un evento nuevo desde la 
+maquina de trabajo (Windows) con un solo comando, sin necesitar conectarse 
+por SSH.
+([ver script](analysis/registro.py))
+
+**Scripts de analisis ampliados**
+Se agrego a `analysis/temp monitor.py` resumen de metricas agrupado por dia 
+(en vez de un promedio global que mezcla dias distintos), manejo de error 
+si el servidor esta desconectado, y un interruptor para activar/desactivar 
+las graficas. Se agregaron dos scripts adicionales: `analysis/procesos 
+recientes.py` (muestra el proceso con mayor uso de CPU en las ultimas 
+lecturas) y `analysis/registro analisis.py` (cruza los eventos de la 
+bitacora de pruebas con las lecturas de temperatura correspondientes).
+([ver script](analysis/temp%20monitor.py))
+
+**Hallazgo: mediaanalysisd como fuente de carga termica**
+Se identifico que `mediaanalysisd` (proceso de macOS que indexa/analiza la 
+biblioteca de Fotos) genera picos sostenidos de temperatura (85-93°C) de 
+forma independiente a n8n. El proceso se reactiva en ciclos de 15-30 
+minutos mientras tiene contenido pendiente de analizar, y en sesiones 
+largas (2+ horas) el sistema dejo de enfriarse por completo entre ciclos. 
+Pendiente: confirmar el impacto de n8n de forma aislada (la prueba original 
+quedo invalidada por esta variable no controlada) y evaluar como limitar 
+el analisis de `mediaanalysisd` antes de retomar el respaldo de fotos/videos.
+
 ## Roadmap
 
 - [ ] Configurar OAuth para conectar Google Calendar directo a n8n (en vez de 
