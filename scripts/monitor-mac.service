@@ -1,0 +1,8 @@
+[Unit]
+Description=Monitor de temperatura del Mac mini
+After=postgresql.service
+
+[Service]
+Type=oneshot
+User=albertqu
+ExecStart=/home/albertqu/scripts/monitor_mac.sh

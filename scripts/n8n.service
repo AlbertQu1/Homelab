@@ -1,0 +1,13 @@
+[Unit]
+Description=n8n
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=albertqu
+Environment=N8N_SECURE_COOKIE=false
+ExecStart=/usr/bin/n8n start
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
