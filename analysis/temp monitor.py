@@ -14,7 +14,7 @@ DB_CONFIG = {
     "password": os.environ.get("POSTGRES_PASSWORD"),
 }
 
-UMBRAL_ALERTA = 65  # °C
+UMBRAL_ALERTA = 50  # °C - alerta temprana, ver niveles completos en monitor_mac.sh
 MOSTRAR_GRAFICOS = False
 
 
