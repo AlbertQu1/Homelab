@@ -46,6 +46,18 @@ y macOS en 80GB para uso ocasional (biblioteca de Fotos / iCloud).
   - La app oficial de Home Assistant en el teléfono apunta a la IP de
     **Tailscale** (no la LAN) para que los push notification funcionen desde
     cualquier red
+  - **HomeKit Bridge** — configurado en `configuration.yaml` con whitelist
+    (`include_entities`) para exponer solo el sensor Xiaomi (temperatura +
+    humedad) a Siri/Home. El switch de emergencia se excluye explícitamente
+    a propósito (nunca debe poder apagarse por Siri/accidente). **Pendiente:**
+    el pareo inicial desde el iPhone falla ("No se encontró el accesorio") —
+    diagnosticado como pérdida de paquetes multicast (mDNS) en el adaptador
+    USB WiFi viejo (802.11g) que conecta al Mac mini a la red del Deco donde
+    vive el teléfono (ping de 60-100ms confirma señal mala; el Deco no tiene
+    puerto Ethernet libre para cablear en su lugar). Opciones evaluadas y
+    pausadas por ahora: comprar switch Ethernet, comprar adaptador WiFi más
+    moderno, o simplemente reintentar el pareo varias veces acercando el
+    teléfono al servidor
 - **Monitoreo de sistema** — script bash que captura métricas de hardware vía
   `lm-sensors`, insertadas en Postgres cada 5 min vía systemd timer
 - **Scripts de análisis (Python)** — corren en la máquina de trabajo (no en el
@@ -128,6 +140,11 @@ aún en condiciones reales.
 - [x] Sensor de temperatura Xiaomi vía Bluetooth (BLE, LYWSDCGQ/01ZM agregado)
 - [x] Sistema de protección térmica completo (4 niveles, switch físico probado)
 - [ ] Cablear el switch de emergencia a la línea de poder real del Mac mini
+- [ ] Resolver el pareo de HomeKit Bridge (falla por mDNS/adaptador WiFi flaky
+      — ver detalle arriba; retomar con reintento, switch Ethernet, o adaptador nuevo)
+- [ ] Meta de largo plazo: espejo completo de la casa en HA (Google Home +
+      Alexa → HA) consumido solo vía HomeKit/Siri, para automatizaciones
+      más avanzadas que las nativas de cada asistente
 - [ ] Sincronizar `scripts/monitor_mac.sh` del repo con la versión live del servidor
 - [ ] Integrar clima real de HA (Postgres) en el análisis de café (reemplazar Open-Meteo)
 - [ ] NAS para cámaras + respaldo de fotos
