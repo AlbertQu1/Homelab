@@ -114,38 +114,56 @@ velocidad mínima.
 ## Sistema de protección térmica
 
 `monitor_mac.sh` corre cada 5 min (`monitor-mac.timer`) y clasifica la
-temperatura del die en 4 niveles acumulativos (cada nivel ejecuta también las
-acciones de los niveles anteriores):
+temperatura del die en 5 niveles (0-4). Los niveles 2-4 requieren varias
+lecturas seguidas por encima del umbral antes de ejecutar su acción (excepto
+el 4), para no reaccionar a picos de CPU de un solo ciclo — ver "Falsos
+positivos" abajo:
 
-| Nivel | Temp | Acción |
-|---|---|---|
-| 1 | ≥50°C | Push real al teléfono vía `notify.mobile_app_qu_phone` (HA) |
-| 2 | ≥55°C | Log de top 5 procesos + `systemctl stop n8n.service` (regla NOPASSWD dedicada en sudoers) |
-| 3 | ≥60°C | Para todo contenedor Docker excepto `homeassistant` |
-| 4 | ≥65°C | Apaga el switch físico de emergencia (`switch.escritorio_failsafe`) |
+| Nivel | Temp | Acción | Lecturas requeridas |
+|---|---|---|---|
+| 0 | ≥50°C | Push al teléfono vía `notify.mobile_app_qu_phone` (HA) | 1 (informativo) |
+| 1 | ≥55°C | Push al teléfono | 1 (informativo) |
+| 2 | ≥65°C | Log de top 5 procesos + `systemctl stop n8n.service` (NOPASSWD en sudoers) + push propio | 3 seguidas (~15 min sostenido) |
+| 3 | ≥75°C | Para todo contenedor Docker excepto `homeassistant` + push propio | 2 seguidas (~10 min sostenido) |
+| 4 | ≥80°C | Apaga el switch físico de emergencia (`switch.escritorio_failsafe`) + push propio | 1 (inmediato) |
 
-Nivel 1 ya se ha activado varias veces en sesiones largas de Claude Code (el
-proceso `claude` sostenido en 10-29% CPU mantiene el die en 46-53°C por horas)
-sin llegar a nivel 2. Niveles 2-4 probados individualmente pero no disparados
-aún en condiciones reales.
+Cada acción de nivel 2-4 se dispara una sola vez por "episodio" sostenido
+(vía flags en `.nivel_state/`) y se rearma solo cuando la temperatura vuelve
+a bajar del umbral, para no repetir la acción/push cada 5 min mientras se
+mantiene caliente.
 
-> **Nota:** el script versionado aquí (`scripts/monitor_mac.sh`) está
-> desactualizado respecto al que corre en el servidor
-> (`/home/albertqu/scripts/monitor_mac.sh`) — pendiente de sincronizar.
+### Falsos positivos y fix del ventilador (2026-08-09)
+
+El nivel 4 (apagado físico) se disparó dos veces por ráfagas de CPU de
+segundos que no representaban sobrecalentamiento real: **65°C** (2026-08-08,
+proceso al 100% CPU) y **78°C** (2026-08-09, `tesseract` al 160% CPU) — en
+ambos casos la lectura siguiente (5 min después) ya había bajado a 50°C.
+
+Investigando esto se encontró la causa raíz: el ventilador (`macfanctld`)
+estaba efectivamente ciego a la temperatura real del CPU — ver
+[`fan-control/README.md`](fan-control/README.md) para el diagnóstico
+completo y el parche aplicado (agrega soporte para `coretemp`/`Package id
+0`, que antes `macfanctld` no leía en absoluto). Los umbrales de
+`monitor_mac.sh` se subieron (antes 50/55/60/65) y se les agregó el
+requisito de lecturas sostenidas como segunda capa de defensa contra este
+mismo tipo de falso positivo.
 
 ## Roadmap
 
 - [ ] Interfaz de administración web (Cockpit) + acceso a archivos (Samba)
 - [x] Configurar Home Assistant (onboarding, dashboard, Bluetooth, Postgres recorder)
 - [x] Sensor de temperatura Xiaomi vía Bluetooth (BLE, LYWSDCGQ/01ZM agregado)
-- [x] Sistema de protección térmica completo (4 niveles, switch físico probado)
+- [x] Sistema de protección térmica completo (5 niveles + lecturas
+      sostenidas, switch físico probado)
+- [x] Parchear `macfanctld` para que el ventilador reaccione a la
+      temperatura real del CPU (`coretemp`), no solo a `applesmc`
 - [ ] Cablear el switch de emergencia a la línea de poder real del Mac mini
 - [ ] Resolver el pareo de HomeKit Bridge (falla por mDNS/adaptador WiFi flaky
       — ver detalle arriba; retomar con reintento, switch Ethernet, o adaptador nuevo)
 - [ ] Meta de largo plazo: espejo completo de la casa en HA (Google Home +
       Alexa → HA) consumido solo vía HomeKit/Siri, para automatizaciones
       más avanzadas que las nativas de cada asistente
-- [ ] Sincronizar `scripts/monitor_mac.sh` del repo con la versión live del servidor
+- [x] Sincronizar `scripts/monitor_mac.sh` del repo con la versión live del servidor
 - [ ] Integrar clima real de HA (Postgres) en el análisis de café (reemplazar Open-Meteo)
 - [ ] NAS para cámaras + respaldo de fotos
 - [x] Configurar Tailscale para acceso remoto seguro
