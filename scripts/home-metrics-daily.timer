@@ -1,0 +1,9 @@
+[Unit]
+Description=Ejecuta home-metrics-daily todos los dias a las 23:55
+
+[Timer]
+OnCalendar=*-*-* 23:55:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
