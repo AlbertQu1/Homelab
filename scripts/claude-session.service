@@ -1,0 +1,17 @@
+[Unit]
+Description=Claude Code (sesion persistente en tmux, con auto-reinicio)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=albertqu
+WorkingDirectory=/home/albertqu
+Environment=TERM=xterm-256color
+ExecStart=/home/albertqu/scripts/claude_watchdog.sh
+ExecStop=/usr/bin/tmux kill-session -t claude
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
