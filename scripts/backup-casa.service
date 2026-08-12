@@ -1,5 +1,5 @@
 [Unit]
-Description=Backup semanal de la base Postgres 'casa' al disco Ice
+Description=Backup semanal de la base Postgres 'casa' a la SD interna
 After=postgresql.service
 
 [Service]

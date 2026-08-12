@@ -154,24 +154,37 @@ mismo tipo de falso positivo.
 `backup-casa.timer` (una hora antes de `weekly-reboot.timer`, para que
 siempre termine antes del reinicio):
 
-1. Monta el disco USB "Ice" (identificado por UUID, no por `/dev/sdX` —
-   evita romperse si el orden de dispositivos cambia) con `uid=1000,gid=1000`
-   para que quede escribible por `albertqu` sin problemas de permisos.
+1. Monta la SD interna del Mac mini (label `postgres_backup`, identificada
+   por UUID, no por `/dev/mmcblkX` — evita romperse si el orden de
+   dispositivos cambia).
 2. `pg_dump` completo de la base `casa` (vía `runuser -u albertqu`, para que
    la autenticación peer de Postgres funcione igual que corriéndolo a mano).
 3. Rota respaldos viejos — conserva solo los últimos 4 (~1 mes de historial).
-4. Desmonta el disco.
+4. Desmonta la SD.
 
-El disco vive desmontado la mayoría del tiempo, solo se conecta durante la
-ventana del backup. Contiene también `pre_migracion/` (el respaldo original
-de la migración macOS → Ubuntu de julio 2026) y respaldos puntuales de
-`bgstats`/`bgg_data` (proyecto Boardgames Assistant) hechos antes de cambios
-grandes en esos datos.
+La base `casa` pesa ~57MB, así que una SD de 4GB sobra por años — se eligió
+la SD (lector interno del Mac mini) en vez de un USB para no ocupar un
+puerto, ya que ese USB se necesita para el proyecto de cámaras de
+seguridad (en exploración, ver conversación de agosto 2026).
 
-**Bug encontrado y corregido durante la primera corrida en vivo:** el paso
-de rotación hacía `cd` dentro del punto de montaje antes de desmontar, así
-que el propio proceso del script dejaba el mount "busy" (`umount: target is
-busy`). Se corrigió usando rutas absolutas en vez de `cd`.
+El disco USB "Ice" (60GB, exFAT) ya no se usa para este backup, pero sigue
+conectado como respaldo aparte: contiene `pre_migracion/` (el respaldo
+original de la migración macOS → Ubuntu de julio 2026) y respaldos puntuales
+de `bgstats`/`bgg_data` (proyecto Boardgames Assistant) hechos antes de
+cambios grandes en esos datos.
+
+**Bugs encontrados y corregidos durante las corridas en vivo:**
+- El paso de rotación hacía `cd` dentro del punto de montaje antes de
+  desmontar, así que el propio proceso del script dejaba el mount "busy"
+  (`umount: target is busy`). Se corrigió usando rutas absolutas en vez de
+  `cd`.
+- Al migrar de exFAT (Ice) a ext4 (SD): exFAT no tiene permisos reales, así
+  que el mount con `uid=1000,gid=1000` forzaba todo a verse como `albertqu`
+  sin importar quién creara los archivos. ext4 sí respeta permisos reales,
+  y como el script corre como `root` vía systemd, la carpeta de backups
+  quedaba creada por `root` — `pg_dump` (que corre como `albertqu`) no podía
+  escribir ahí. Se corrigió con un `chown albertqu:albertqu` explícito
+  después de crear la carpeta.
 
 ## Roadmap
 
