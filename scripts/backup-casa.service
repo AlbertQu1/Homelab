@@ -1,0 +1,8 @@
+[Unit]
+Description=Backup semanal de la base Postgres 'casa' al disco Ice
+After=postgresql.service
+
+[Service]
+Type=oneshot
+User=root
+ExecStart=/home/albertqu/scripts/backup_casa_to_ice.sh

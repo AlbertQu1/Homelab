@@ -1,0 +1,9 @@
+[Unit]
+Description=Corre backup-casa.service una vez a la semana
+
+[Timer]
+OnCalendar=Sun *-*-* 03:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
