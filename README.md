@@ -148,6 +148,31 @@ completo y el parche aplicado (agrega soporte para `coretemp`/`Package id
 requisito de lecturas sostenidas como segunda capa de defensa contra este
 mismo tipo de falso positivo.
 
+## Respaldo semanal de Postgres
+
+`scripts/backup_casa_to_ice.sh` corre cada domingo 3:00am vía
+`backup-casa.timer` (una hora antes de `weekly-reboot.timer`, para que
+siempre termine antes del reinicio):
+
+1. Monta el disco USB "Ice" (identificado por UUID, no por `/dev/sdX` —
+   evita romperse si el orden de dispositivos cambia) con `uid=1000,gid=1000`
+   para que quede escribible por `albertqu` sin problemas de permisos.
+2. `pg_dump` completo de la base `casa` (vía `runuser -u albertqu`, para que
+   la autenticación peer de Postgres funcione igual que corriéndolo a mano).
+3. Rota respaldos viejos — conserva solo los últimos 4 (~1 mes de historial).
+4. Desmonta el disco.
+
+El disco vive desmontado la mayoría del tiempo, solo se conecta durante la
+ventana del backup. Contiene también `pre_migracion/` (el respaldo original
+de la migración macOS → Ubuntu de julio 2026) y respaldos puntuales de
+`bgstats`/`bgg_data` (proyecto Boardgames Assistant) hechos antes de cambios
+grandes en esos datos.
+
+**Bug encontrado y corregido durante la primera corrida en vivo:** el paso
+de rotación hacía `cd` dentro del punto de montaje antes de desmontar, así
+que el propio proceso del script dejaba el mount "busy" (`umount: target is
+busy`). Se corrigió usando rutas absolutas en vez de `cd`.
+
 ## Roadmap
 
 - [ ] Interfaz de administración web (Cockpit) + acceso a archivos (Samba)
@@ -167,4 +192,4 @@ mismo tipo de falso positivo.
 - [ ] Integrar clima real de HA (Postgres) en el análisis de café (reemplazar Open-Meteo)
 - [ ] NAS para cámaras + respaldo de fotos
 - [x] Configurar Tailscale para acceso remoto seguro
-- [ ] Backup automatizado de Postgres (`pg_dump`) hacia la nube
+- [x] Backup automatizado de Postgres (`pg_dump`) — semanal, a disco USB local (no a la nube todavía)
