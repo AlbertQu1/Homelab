@@ -73,6 +73,13 @@ y macOS en 80GB para uso ocasional (biblioteca de Fotos / iCloud).
     pausadas por ahora: comprar switch Ethernet, comprar adaptador WiFi más
     moderno, o simplemente reintentar el pareo varias veces acercando el
     teléfono al servidor
+- **Jellyfin** — contenedor Docker (`jellyfin/jellyfin:latest`), puerto 8096,
+  música/video personal (`~/Media`, respaldada del disco externo de iTunes).
+  MusicBrainz + TheAudioDB para metadata (carátulas, fotos de artista).
+  Expuesto también por HTTPS vía `tailscale serve --https=8444`. **Nota
+  operativa:** la tarea de normalización de audio (loudness/LUFS) es pesada
+  para este CPU de 2014 — corriendo de noche, con vigilancia de temperatura,
+  ver sección de protección térmica abajo
 - **Monitoreo de sistema** — script bash que captura métricas de hardware vía
   `lm-sensors`, insertadas en Postgres cada 5 min vía systemd timer
 - **Scripts de análisis (Python)** — corren en la máquina de trabajo (no en el
