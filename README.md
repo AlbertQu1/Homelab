@@ -14,9 +14,24 @@ y macOS en 80GB para uso ocasional (biblioteca de Fotos / iCloud).
 - **Ubuntu Server LTS** — sistema principal, headless, administrado vía SSH
 - **PostgreSQL** — base de datos `casa`, instalada vía apt, accesible en red local,
   corriendo como servicio systemd
-  - Esquemas: `coffee_analytics` (café), `mac_metrics` (métricas del servidor)
+  - Esquemas: `coffee_analytics` (café), `mac_metrics` (métricas del servidor),
+    `home_assistant` (recorder de HA, ver abajo), `boardgames_stats`/
+    `boardgames_bgg` (Boardgames Assistant), `soda_stream` (Soda Stream
+    Logger/Gasificador), `vacaciones` (Vacaciones app), `personal_wiki`
+    (Personal Assistant), y el grafo de personas `red_social` (extensión
+    Apache AGE, compartido entre varios de los proyectos de arriba — no
+    acotado a uno solo)
 - **n8n** — orquestador de automatizaciones, vía npm, corriendo como servicio systemd
-  - Workflow activo: sincronización Google Sheets → Postgres
+  - Workflows activos (agosto 2026): **BG Stats** (ingesta de exports desde
+    Google Drive → Postgres, Boardgames Assistant), **New Rules** (buzón de
+    reglamentos de juegos, mismo proyecto), **Wiki Inbox** (ingesta de notas
+    del vault, Personal Assistant), **Notificaciones Homelab → Slack**
+    (webhook `/notificar-slack`, canal `todo-albert-qu` — usado por las
+    alertas térmicas de `monitor_mac.sh` y disponible para cualquier otro
+    proyecto). El workflow original de sincronización Google Sheets → café
+    (`Coffee Analitics CSV`/`Coffee analitics`) ya **no está activo** — el
+    pipeline de café se reconstruyó directo sobre Postgres (ver el repo
+    `coffee-consumption-analytics`)
 - **Docker** — nativo (sin capas de virtualización), disponible para contenedores
 - **Home Assistant** — contenedor Docker (`ghcr.io/home-assistant/home-assistant:stable`,
   `--privileged`, `--network=host`, `restart: unless-stopped`), config en
@@ -65,6 +80,13 @@ y macOS en 80GB para uso ocasional (biblioteca de Fotos / iCloud).
 - **Tailscale** — acceso remoto seguro fuera de la red local, IP `100.101.5.90`.
   Windows y iPhone (vía Termius) unidos al mismo tailnet — SSH y acceso a apps
   web (ej. Coffee Logger) funcionan igual estando en casa o fuera
+- **Cockpit** — interfaz de administración web, `cockpit.socket` activo
+  (acceso roto tras el cambio de IP local a `192.168.68.129`, corregido
+  agosto 2026)
+- **File Browser** — visor web de archivos con preview real de imagen/video/
+  PDF (`filebrowser.service`), reemplaza la idea original de Samba del
+  roadmap — más simple para el caso de uso (solo Alberto, sin necesidad de
+  compartir carpetas como unidad de red)
 
 ## Migración de macOS a Linux (julio 2026)
 
@@ -106,8 +128,10 @@ velocidad mínima.
   - `iphone-termius` — generada en la app Termius (ED25519, con passphrase que
     cifra la llave privada en el teléfono; Termius la desbloquea vía Face ID/huella)
 - **Termius** (iPhone) — dos hosts configurados: uno con la IP local
-  (`192.168.0.57`, solo funciona en la red de casa) y otro con la IP de
-  Tailscale (`100.101.5.90`, funciona en cualquier red)
+  (`192.168.68.129` — cambió en agosto 2026 al pasar el router a la IP
+  general de la casa, antes era `192.168.0.57`; solo funciona en la red de
+  casa) y otro con la IP de Tailscale (`100.101.5.90`, funciona en
+  cualquier red)
 - VS Code (Windows, desarrollo) se queda intencionalmente en la IP local — es
   solo para trabajo dentro de casa, no necesita la IP de Tailscale
 
@@ -188,7 +212,8 @@ cambios grandes en esos datos.
 
 ## Roadmap
 
-- [ ] Interfaz de administración web (Cockpit) + acceso a archivos (Samba)
+- [x] Interfaz de administración web (Cockpit) + acceso a archivos (File
+      Browser en vez de Samba — más simple para un solo usuario)
 - [x] Configurar Home Assistant (onboarding, dashboard, Bluetooth, Postgres recorder)
 - [x] Sensor de temperatura Xiaomi vía Bluetooth (BLE, LYWSDCGQ/01ZM agregado)
 - [x] Sistema de protección térmica completo (5 niveles + lecturas
@@ -206,3 +231,22 @@ cambios grandes en esos datos.
 - [ ] NAS para cámaras + respaldo de fotos
 - [x] Configurar Tailscale para acceso remoto seguro
 - [x] Backup automatizado de Postgres (`pg_dump`) — semanal, a disco USB local (no a la nube todavía)
+- [x] Notificaciones por Slack — workflow n8n `Notificaciones Homelab -> Slack`
+      (webhook, canal `todo-albert-qu`), usado por las alertas térmicas y
+      disponible como canal genérico para cualquier proyecto
+
+## Nota sobre las apps ("Loggers")
+
+Las apps de captura/consulta (Coffee Logger, Soda Stream Logger, Vacaciones,
+Boardgames Assistant, Personal Assistant) viven en repos de GitHub aparte
+(públicos o privados según el caso), no en este repo de infraestructura —
+por eso no se documentan aquí a detalle. Corren como servicios systemd sobre
+el mismo Postgres `casa` de arriba, la mayoría detrás de Caddy como reverse
+proxy (puertos internos 3010-3013, expuestos en 3000-3003). Dos capacidades
+cross-proyecto vale la pena tener presentes desde aquí porque no son
+específicas de un solo repo:
+- **Diagramas Mermaid en el chat** — Personal Assistant y Boardgames
+  Assistant generan diagramas de relaciones (`red_social`, grupos sociales)
+  directo en sus respuestas de `/ask`, sin que Alberto escriba código.
+- **Slack** — el mismo webhook de n8n de arriba queda disponible para que
+  cualquier app mande notificaciones sin reinventar el workflow.

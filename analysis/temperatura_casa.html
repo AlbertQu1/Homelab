@@ -1,0 +1,578 @@
+<title>Termómetro de casa</title>
+<style>
+  :root {
+    color-scheme: light;
+    --plane:       #f9f9f7;
+    --surface:     #fcfcfb;
+    --ink:         #0b0b0b;
+    --ink-2:       #52514e;
+    --muted:       #898781;
+    --grid:        #e1e0d9;
+    --axis:        #c3c2b7;
+    --hairline:    rgba(11,11,11,0.10);
+    --cocina:      #eb6834;
+    --cuarto:      #2a78d6;
+    --warning:     #fab219;
+    --warning-ink: #7a5200;
+    --shadow:      0 1px 2px rgba(11,11,11,0.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --plane:       #0d0d0d;
+      --surface:     #1a1a19;
+      --ink:         #ffffff;
+      --ink-2:       #c3c2b7;
+      --muted:       #898781;
+      --grid:        #2c2c2a;
+      --axis:        #383835;
+      --hairline:    rgba(255,255,255,0.10);
+      --cocina:      #d95926;
+      --cuarto:      #3987e5;
+      --warning:     #fab219;
+      --warning-ink: #fab219;
+      --shadow:      none;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --plane:       #0d0d0d;
+    --surface:     #1a1a19;
+    --ink:         #ffffff;
+    --ink-2:       #c3c2b7;
+    --muted:       #898781;
+    --grid:        #2c2c2a;
+    --axis:        #383835;
+    --hairline:    rgba(255,255,255,0.10);
+    --cocina:      #d95926;
+    --cuarto:      #3987e5;
+    --warning:     #fab219;
+    --warning-ink: #fab219;
+    --shadow:      none;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--plane);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    line-height: 1.55;
+    margin: 0;
+    padding: 40px 20px 72px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 940px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  header { display: flex; flex-direction: column; gap: 10px; }
+  h1 {
+    font-size: clamp(28px, 5vw, 40px);
+    font-weight: 700;
+    letter-spacing: -0.022em;
+    line-height: 1.1;
+    text-wrap: balance;
+    margin: 0;
+  }
+  .dek {
+    font-size: 17px;
+    color: var(--ink-2);
+    max-width: 62ch;
+    margin: 0;
+    text-wrap: pretty;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    font-size: 13px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    padding-top: 6px;
+    border-top: 1px solid var(--hairline);
+    margin-top: 4px;
+  }
+  .meta b { color: var(--ink-2); font-weight: 600; }
+
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+  }
+  .tile {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: 10px;
+    padding: 14px 16px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    box-shadow: var(--shadow);
+  }
+  .tile .label {
+    font-size: 11px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .swatch { width: 9px; height: 9px; border-radius: 2px; flex: none; }
+  .tile .value {
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+  .tile .value .unit { font-size: 16px; font-weight: 500; color: var(--ink-2); }
+  .tile .foot { font-size: 12.5px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: 10px;
+    padding: 20px 20px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: var(--shadow);
+  }
+  .card h2 {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+  .card .read {
+    font-size: 14px;
+    color: var(--ink-2);
+    margin: 0 0 10px;
+    max-width: 70ch;
+    text-wrap: pretty;
+  }
+
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin: 2px 0 8px; }
+  .legend span {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12.5px; color: var(--ink-2); font-weight: 500;
+  }
+
+  .chart { position: relative; width: 100%; }
+  .chart svg { display: block; width: 100%; height: auto; }
+  .tip {
+    position: absolute;
+    pointer-events: none;
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: 7px;
+    padding: 7px 10px;
+    font-size: 12.5px;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+    box-shadow: 0 3px 12px rgba(11,11,11,0.13);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity .1s;
+    z-index: 3;
+  }
+  .tip.on { opacity: 1; }
+  .tip .row { display: flex; align-items: center; gap: 6px; }
+  .tip .head { font-weight: 600; margin-bottom: 3px; }
+  .tip .num { margin-left: auto; padding-left: 12px; font-weight: 600; }
+
+  .findings { display: flex; flex-direction: column; gap: 0; }
+  .finding {
+    display: grid;
+    grid-template-columns: 26px 1fr;
+    gap: 0 14px;
+    padding: 14px 0;
+    border-top: 1px solid var(--hairline);
+    align-items: baseline;
+  }
+  .finding:first-of-type { border-top: none; }
+  .finding .n {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .finding h3 { font-size: 15px; font-weight: 600; margin: 0 0 3px; letter-spacing: -0.005em; }
+  .finding p { font-size: 14px; color: var(--ink-2); margin: 0; max-width: 68ch; text-wrap: pretty; }
+
+  .flag {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-left: 3px solid var(--warning);
+    border-radius: 10px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .flag .tag {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
+    color: var(--warning-ink);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .flag h2 { font-size: 17px; font-weight: 600; margin: 0; }
+  .flag p { margin: 0; font-size: 14px; color: var(--ink-2); max-width: 70ch; text-wrap: pretty; }
+  .counts {
+    display: flex; flex-wrap: wrap; gap: 10px 32px;
+    margin-top: 4px; padding-top: 12px; border-top: 1px solid var(--hairline);
+  }
+  .counts div { display: flex; flex-direction: column; }
+  .counts .big { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .counts .cap { font-size: 12px; color: var(--muted); }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 13.5px;
+    font-variant-numeric: tabular-nums;
+  }
+  .scroll { overflow-x: auto; }
+  th, td { text-align: right; padding: 7px 10px; border-bottom: 1px solid var(--hairline); white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; }
+  th {
+    font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--muted); font-weight: 600;
+  }
+  td { color: var(--ink-2); }
+  td:first-child { color: var(--ink); font-weight: 500; }
+  details > summary {
+    cursor: pointer; font-size: 13px; color: var(--ink-2);
+    padding: 6px 0; font-weight: 500;
+  }
+  details > summary:focus-visible { outline: 2px solid var(--cuarto); outline-offset: 2px; border-radius: 3px; }
+
+  footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--hairline); padding-top: 14px; }
+  footer code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12px; color: var(--ink-2);
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Home Assistant · 7–15 agosto 2026</p>
+    <h1>Termómetro de casa</h1>
+    <p class="dek">Ocho días de lecturas de los dos sensores de la casa. La cocina tiene un ciclo diario nítido; el cuarto casi no reporta. Ese contraste resultó ser el hallazgo principal.</p>
+    <div class="meta">
+      <span><b>2</b> estancias</span>
+      <span><b>37,245</b> lecturas</span>
+      <span><b>19.8 – 23.8 °C</b> rango total</span>
+      <span>última lectura <b>15 ago 10:06</b></span>
+    </div>
+  </header>
+
+  <section class="tiles">
+    <div class="tile">
+      <span class="label"><i class="swatch" style="background:var(--cocina)"></i>Cocina ahora</span>
+      <span class="value">21.7<span class="unit"> °C</span></span>
+      <span class="foot">65.3 % HR · 10:06</span>
+    </div>
+    <div class="tile">
+      <span class="label"><i class="swatch" style="background:var(--cuarto)"></i>Cuarto ahora</span>
+      <span class="value">23.1<span class="unit"> °C</span></span>
+      <span class="foot">59 % HR · 07:45 (viejo)</span>
+    </div>
+    <div class="tile">
+      <span class="label">Promedio 8 días</span>
+      <span class="value">22.6<span class="unit"> °C</span></span>
+      <span class="foot">cocina 22.1 · cuarto 23.2</span>
+    </div>
+    <div class="tile">
+      <span class="label">Oscilación diaria</span>
+      <span class="value">1.6<span class="unit"> °C</span></span>
+      <span class="foot">cocina, de 21.4 a 23.0</span>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>La cocina respira con el día</h2>
+    <p class="read">Promedio de cada hora sobre los 8 días, con 37,109 lecturas detrás. El punto más frío es a las 9:00 y el más cálido a las 16:00 — un desfase de unas 4 horas respecto al pico solar, que es lo típico de un muro que tarda en soltar el calor que acumuló.</p>
+    <div class="chart" id="c1"></div>
+  </section>
+
+  <section class="card">
+    <h2>Día a día, el cuarto siempre va arriba</h2>
+    <p class="read">Promedio diario de cada estancia. El cuarto sale más cálido que la cocina los 8 días sin excepción — en promedio 1.1 °C. El 10 y 11 de agosto la cocina cae más de un grado (y toca su mínimo de la semana, 19.8 °C) mientras el cuarto apenas se mueve; no hay dato de clima exterior de esos dos días para saber si fue el tiempo o algo de la casa.</p>
+    <div class="legend">
+      <span><i class="swatch" style="background:var(--cocina)"></i>Cocina</span>
+      <span><i class="swatch" style="background:var(--cuarto)"></i>Cuarto</span>
+    </div>
+    <div class="chart" id="c2"></div>
+    <details>
+      <summary>Ver la tabla</summary>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th>Fecha</th><th>Cocina prom.</th><th>Cocina mín/máx</th><th>Cuarto prom.</th><th>Cuarto mín/máx</th></tr>
+          </thead>
+          <tbody id="tabla"></tbody>
+        </table>
+      </div>
+    </details>
+  </section>
+
+  <section class="card">
+    <h2>La humedad delata las comidas</h2>
+    <p class="read">Humedad relativa de la cocina por hora. La línea es el promedio; los puntos marcados son los picos máximos registrados, y caen justo en las tres horas de cocinar. Fuera de esos momentos la humedad baja hasta 52 % a media tarde y se recupera sola de noche.</p>
+    <div class="chart" id="c3"></div>
+  </section>
+
+  <section class="card">
+    <p class="eyebrow">Lo que dicen los datos</p>
+    <div class="findings">
+      <div class="finding">
+        <span class="n">01</span>
+        <div>
+          <h3>La casa es térmicamente estable</h3>
+          <p>Las 37,245 lecturas de la semana caben entre 19.8 y 23.8 °C. Ningún día pasó de 24 °C ni bajó de 19 °C, con lluvia afuera casi todos los días.</p>
+        </div>
+      </div>
+      <div class="finding">
+        <span class="n">02</span>
+        <div>
+          <h3>Adentro se está unos 4 °C más caliente que afuera</h3>
+          <p>La referencia exterior es flaca: de los 8 días solo el 7 y el 13 de agosto tienen clima registrado (16.7 y 17.8 °C, con 26 y 7 mm de lluvia), porque el dato viene de cuando preparaste un Soda Stream. Contra esos dos puntos, la casa iba 4–5 °C arriba sin calefacción. Es una señal consistente, no una medición continua.</p>
+        </div>
+      </div>
+      <div class="finding">
+        <span class="n">03</span>
+        <div>
+          <h3>El cuarto es el punto más cálido, y el más plano</h3>
+          <p>+1.1 °C sobre la cocina en promedio, los 8 días con el mismo signo. Su rango completo de la semana (22.2–23.8 °C) es la mitad de estrecho que el de la cocina (19.8–23.8 °C).</p>
+        </div>
+      </div>
+      <div class="finding">
+        <span class="n">04</span>
+        <div>
+          <h3>El cambio de sensor no rompió la serie</h3>
+          <p>El Cleargrass reemplazó al Xiaomi 703e en la cocina el 12 de agosto a las 17:21. Durante 6 minutos los dos reportaron a la vez: las dos lecturas del nuevo (23.1 °C) caen exactamente en el rango que marcaba el viejo (23.1–23.2 °C). No hay salto de calibración, así que la serie antes y después es comparable.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="flag">
+    <span class="tag">⚠ Límite de los datos</span>
+    <h2>El sensor del cuarto reporta demasiado poco</h2>
+    <p>El SwitchBot Hub 2 mandó <b>136 lecturas en 8 días</b> — unas 17 al día. Doce horas del día tienen 4 lecturas o menos en toda la semana, y las 12:00 tienen exactamente una. Por eso este reporte no dibuja una curva horaria del cuarto: con esa densidad, cualquier forma que saliera sería ruido, no un patrón. Los promedios diarios sí aguantan, y son los que se usan arriba.</p>
+    <p>Si quieres analizar el cuarto con el mismo detalle que la cocina, hay que subirle la frecuencia de reporte al Hub 2 en Home Assistant. Vale la pena: es el cuarto donde duermes, y ahora mismo es el que menos sabemos.</p>
+    <div class="counts">
+      <div><span class="big" style="color:var(--cocina)">37,109</span><span class="cap">lecturas · cocina</span></div>
+      <div><span class="big" style="color:var(--cuarto)">136</span><span class="cap">lecturas · cuarto</span></div>
+      <div><span class="big">273×</span><span class="cap">diferencia de densidad</span></div>
+    </div>
+  </section>
+
+  <footer>
+    Fuente: <code>casa.home_assistant.states</code> y <code>daily_summary</code> (resumen diario de <code>~/scripts/home_metrics_daily.sh</code>). Clima exterior de <code>soda_stream.soda_preparations</code>. Horas en America/Mexico_City. El resumen diario del 15 de agosto todavía no corre, así que ese día sale solo de lecturas crudas.
+  </footer>
+</div>
+
+<script>
+(function () {
+  const tempHora = [22.09,22.00,21.98,21.83,21.71,21.73,21.49,21.46,21.52,21.43,21.70,21.81,21.95,22.30,22.50,22.58,22.99,22.94,22.65,22.49,22.29,22.28,22.32,22.08];
+  const humHora  = [65.3,64.2,63.3,62.9,63.0,62.5,62.0,62.0,62.3,62.4,63.4,59.6,56.7,54.7,53.2,52.8,52.2,56.6,58.9,60.6,64.8,65.9,66.2,66.1];
+  const humPico  = { 10: 84.5, 17: 79.7, 20: 77.5, 21: 81.4 };
+  const dias = [
+    { d: '7 ago',  cocina: 23.00, cuarto: 23.23, cmin: 22.3, cmax: 23.8, qmin: 22.8, qmax: 23.7 },
+    { d: '8 ago',  cocina: 22.72, cuarto: 23.53, cmin: 21.9, cmax: 23.5, qmin: 23.3, qmax: 23.8 },
+    { d: '9 ago',  cocina: 22.54, cuarto: 23.48, cmin: 21.4, cmax: 23.1, qmin: 23.2, qmax: 23.7 },
+    { d: '10 ago', cocina: 21.43, cuarto: 22.98, cmin: 20.2, cmax: 23.2, qmin: 22.7, qmax: 23.1 },
+    { d: '11 ago', cocina: 21.36, cuarto: 22.78, cmin: 19.8, cmax: 23.7, qmin: 22.2, qmax: 23.6 },
+    { d: '12 ago', cocina: 21.69, cuarto: 23.02, cmin: 20.5, cmax: 23.4, qmin: 22.6, qmax: 23.5 },
+    { d: '13 ago', cocina: 22.03, cuarto: 23.27, cmin: 20.4, cmax: 23.8, qmin: 23.0, qmax: 23.6 },
+    { d: '14 ago', cocina: 21.66, cuarto: 23.13, cmin: 20.2, cmax: 23.6, qmin: 22.6, qmax: 23.7 }
+  ];
+
+  const tb = document.getElementById('tabla');
+  dias.forEach(function (r) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td>' + r.d + '</td><td>' + r.cocina.toFixed(2) + ' °C</td><td>' +
+      r.cmin.toFixed(1) + ' – ' + r.cmax.toFixed(1) + '</td><td>' + r.cuarto.toFixed(2) +
+      ' °C</td><td>' + r.qmin.toFixed(1) + ' – ' + r.qmax.toFixed(1) + '</td>';
+    tb.appendChild(tr);
+  });
+
+  const NS = 'http://www.w3.org/2000/svg';
+  function el(name, attrs) {
+    const n = document.createElementNS(NS, name);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    return n;
+  }
+  function css(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+  // Un solo renderer de líneas para las tres gráficas. `series` lleva su color por
+  // entidad (cocina siempre naranja, cuarto siempre azul), nunca por posición.
+  function lineas(host, cfg) {
+    function draw() {
+      host.textContent = '';
+      const W = host.clientWidth || 700;
+      const H = cfg.height || 300;
+      const pad = { t: 16, r: cfg.padRight || 16, b: 34, l: 44 };
+      const iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
+      const svg = el('svg', { viewBox: '0 0 ' + W + ' ' + H, width: W, height: H, role: 'img' });
+      svg.appendChild(el('title', {})).textContent = cfg.alt;
+
+      const n = cfg.labels.length;
+      const x = i => pad.l + (n === 1 ? iw / 2 : iw * i / (n - 1));
+      const y = v => pad.t + ih - ih * (v - cfg.min) / (cfg.max - cfg.min);
+
+      const inkMuted = css('--muted'), gridC = css('--grid'), axisC = css('--axis');
+
+      (cfg.ticks || []).forEach(function (t) {
+        svg.appendChild(el('line', { x1: pad.l, x2: W - pad.r, y1: y(t), y2: y(t), stroke: gridC, 'stroke-width': 1 }));
+        const lb = el('text', { x: pad.l - 9, y: y(t) + 4, 'text-anchor': 'end', fill: inkMuted,
+          'font-size': 11, 'font-family': 'inherit', style: 'font-variant-numeric:tabular-nums' });
+        lb.textContent = t + cfg.unit;
+        svg.appendChild(lb);
+      });
+      svg.appendChild(el('line', { x1: pad.l, x2: W - pad.r, y1: pad.t + ih, y2: pad.t + ih, stroke: axisC, 'stroke-width': 1 }));
+
+      cfg.labels.forEach(function (lab, i) {
+        if (lab === '') return;
+        const t = el('text', { x: x(i), y: H - 12, 'text-anchor': 'middle', fill: inkMuted,
+          'font-size': 11, 'font-family': 'inherit', style: 'font-variant-numeric:tabular-nums' });
+        t.textContent = lab;
+        svg.appendChild(t);
+      });
+
+      cfg.series.forEach(function (s) {
+        const color = css(s.colorVar);
+        let d = '';
+        s.values.forEach(function (v, i) { d += (i ? 'L' : 'M') + x(i) + ' ' + y(v); });
+        if (s.area) {
+          const a = el('path', { d: d + 'L' + x(n - 1) + ' ' + (pad.t + ih) + 'L' + x(0) + ' ' + (pad.t + ih) + 'Z',
+            fill: color, opacity: 0.09 });
+          svg.appendChild(a);
+        }
+        svg.appendChild(el('path', { d: d, fill: 'none', stroke: color, 'stroke-width': 2,
+          'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+        if (s.dots) {
+          s.values.forEach(function (v, i) {
+            svg.appendChild(el('circle', { cx: x(i), cy: y(v), r: 4, fill: color,
+              stroke: css('--surface'), 'stroke-width': 2 }));
+          });
+        }
+        if (s.endLabel) {
+          const t = el('text', { x: x(n - 1) + 8, y: y(s.values[n - 1]) + 4, fill: color,
+            'font-size': 12, 'font-weight': 600, 'font-family': 'inherit' });
+          t.textContent = s.name;
+          svg.appendChild(t);
+        }
+      });
+
+      (cfg.marks || []).forEach(function (m) {
+        const color = css(m.colorVar);
+        svg.appendChild(el('circle', { cx: x(m.i), cy: y(m.v), r: 5, fill: color,
+          stroke: css('--surface'), 'stroke-width': 2 }));
+        const t = el('text', { x: x(m.i), y: y(m.v) - 12, 'text-anchor': m.anchor || 'middle',
+          fill: css('--ink-2'), 'font-size': 11.5, 'font-weight': 600, 'font-family': 'inherit',
+          style: 'font-variant-numeric:tabular-nums' });
+        t.textContent = m.text;
+        svg.appendChild(t);
+      });
+
+      const cross = el('line', { y1: pad.t, y2: pad.t + ih, stroke: axisC, 'stroke-width': 1, opacity: 0 });
+      svg.appendChild(cross);
+      const hits = cfg.series.map(function (s) {
+        const c = el('circle', { r: 5, fill: css(s.colorVar), stroke: css('--surface'), 'stroke-width': 2, opacity: 0 });
+        svg.appendChild(c);
+        return c;
+      });
+      host.appendChild(svg);
+
+      const tip = document.createElement('div');
+      tip.className = 'tip';
+      host.appendChild(tip);
+
+      svg.addEventListener('pointermove', function (e) {
+        const r = svg.getBoundingClientRect();
+        const px = (e.clientX - r.left) * (W / r.width);
+        let i = Math.round((px - pad.l) / (iw / Math.max(n - 1, 1)));
+        i = Math.max(0, Math.min(n - 1, i));
+        cross.setAttribute('x1', x(i)); cross.setAttribute('x2', x(i)); cross.setAttribute('opacity', 1);
+        let html = '<div class="head">' + cfg.tipHead(i) + '</div>';
+        cfg.series.forEach(function (s, k) {
+          hits[k].setAttribute('cx', x(i)); hits[k].setAttribute('cy', y(s.values[i]));
+          hits[k].setAttribute('opacity', 1);
+          html += '<div class="row"><i class="swatch" style="background:' + css(s.colorVar) + '"></i>' +
+                  s.name + '<span class="num">' + s.values[i].toFixed(1) + cfg.unit + '</span></div>';
+        });
+        tip.innerHTML = html;
+        tip.classList.add('on');
+        const tw = tip.offsetWidth;
+        const left = Math.max(0, Math.min(host.clientWidth - tw, (x(i) / W) * host.clientWidth - tw / 2));
+        tip.style.left = left + 'px';
+        tip.style.top = '0px';
+      });
+      svg.addEventListener('pointerleave', function () {
+        cross.setAttribute('opacity', 0);
+        hits.forEach(function (c) { c.setAttribute('opacity', 0); });
+        tip.classList.remove('on');
+      });
+    }
+    draw();
+    let t; window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(draw, 120); });
+    if (window.matchMedia) {
+      const mq = window.matchMedia('(prefers-color-scheme: dark)');
+      if (mq.addEventListener) mq.addEventListener('change', draw);
+    }
+  }
+
+  const horaLabels = tempHora.map(function (_, i) { return i % 3 === 0 ? (i < 10 ? '0' + i : i) + ':00' : ''; });
+
+  lineas(document.getElementById('c1'), {
+    alt: 'Temperatura promedio de la cocina por hora del día, de 21.4 °C a las 9:00 hasta 23.0 °C a las 16:00.',
+    labels: horaLabels, min: 21, max: 23.4, ticks: [21, 21.5, 22, 22.5, 23], unit: ' °C',
+    series: [{ name: 'Cocina', colorVar: '--cocina', values: tempHora, area: true }],
+    marks: [
+      { i: 9,  v: 21.43, colorVar: '--cocina', text: 'mín 21.4 · 9:00' },
+      { i: 16, v: 22.99, colorVar: '--cocina', text: 'máx 23.0 · 16:00' }
+    ],
+    tipHead: function (i) { return (i < 10 ? '0' + i : i) + ':00'; }
+  });
+
+  lineas(document.getElementById('c2'), {
+    alt: 'Promedio diario de temperatura: el cuarto por encima de la cocina los ocho días.',
+    labels: dias.map(function (r) { return r.d; }), min: 21, max: 24,
+    ticks: [21, 22, 23, 24], unit: ' °C', padRight: 62,
+    series: [
+      { name: 'Cuarto', colorVar: '--cuarto', values: dias.map(function (r) { return r.cuarto; }), dots: true, endLabel: true },
+      { name: 'Cocina', colorVar: '--cocina', values: dias.map(function (r) { return r.cocina; }), dots: true, endLabel: true }
+    ],
+    tipHead: function (i) { return dias[i].d; }
+  });
+
+  lineas(document.getElementById('c3'), {
+    alt: 'Humedad relativa de la cocina por hora, con picos de cocinar a las 10:00, 17:00 y 21:00.',
+    labels: horaLabels, min: 50, max: 88, ticks: [50, 60, 70, 80], unit: ' %',
+    series: [{ name: 'Cocina', colorVar: '--cocina', values: humHora, area: true }],
+    marks: Object.keys(humPico).map(function (h) {
+      return { i: +h, v: humPico[h], colorVar: '--cocina', text: 'pico ' + humPico[h] + ' %' };
+    }),
+    tipHead: function (i) { return (i < 10 ? '0' + i : i) + ':00 · promedio'; }
+  });
+})();
+</script>
