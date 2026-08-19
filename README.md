@@ -80,6 +80,20 @@ y macOS en 80GB para uso ocasional (biblioteca de Fotos / iCloud).
   operativa:** la tarea de normalización de audio (loudness/LUFS) es pesada
   para este CPU de 2014 — corriendo de noche, con vigilancia de temperatura,
   ver sección de protección térmica abajo
+- **Immich** — contenedor Docker Compose (server + machine-learning + redis
+  + Postgres propio, separado de `casa` a propósito), puerto 2283, respaldo
+  de fotos personales (self-hosted, reemplaza Google Photos/iCloud). Fuente
+  de fotos: **External Library** apuntando a `~/Media/Photos` (montado
+  read-write, no solo lectura — Immich necesita escribir sidecars `.xmp`
+  junto al original cuando editas fecha/GPS a mano; con el mount en `:ro`
+  esas ediciones fallaban en silencio). Escaneo **manual** (no automático)
+  a propósito, para controlar la carga mientras se van agregando carpetas
+  del disco duro poco a poco. El contenedor `immich-machine-learning` (cara/
+  Smart Search/CLIP) tiene un límite duro de **2 CPUs** en el
+  `docker-compose.yml` para no competir por margen térmico con el resto del
+  sistema — mismo espíritu que el guardarraíl de `monitor_mac.sh`. Puente
+  con el catálogo de personas de Personal Assistant vía
+  `immich_person_sync.py` (ver ese repo).
 - **Monitoreo de sistema** — script bash que captura métricas de hardware vía
   `lm-sensors`, insertadas en Postgres cada 5 min vía systemd timer
 - **Scripts de análisis (Python)** — corren en la máquina de trabajo (no en el
