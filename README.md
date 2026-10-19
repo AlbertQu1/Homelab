@@ -231,6 +231,48 @@ cambios grandes en esos datos.
   escribir ahí. Se corrigió con un `chown albertqu:albertqu` explícito
   después de crear la carpeta.
 
+## Reinicio semanal y arranque escalonado
+
+`weekly-reboot.timer` reinicia el servidor cada domingo 4:00am. Al volver,
+las 5 apps Next.js (Coffee Logger, Soda Stream Logger, Vacaciones,
+Boardgames Assistant, Personal Assistant) corren `pnpm build` en su
+`ExecStartPre` antes de arrancar.
+
+**Problema (detectado 2026-10-13):** cada `.service` tenía un `sleep` fijo
+(0/10/30/60/90 s) para escalonarlas, pero systemd cuenta ese `sleep` dentro
+de su límite de arranque por defecto (`TimeoutStartSec` = 90 s). Además
+los `sleep` no evitaban que las 5 compilaran a la vez junto con Docker
+(Immich, Jellyfin, etc.), así que cada build tardaba 45-73 s en lugar de
+~15 s. Resultado: todas fallaban por *timeout* en el primer intento y solo
+levantaban gracias a `Restart=on-failure` (1-3 reintentos, ~5-7 min en
+total). Personal Assistant, con `sleep 90`, nunca podía arrancar en su
+primer intento.
+
+**Fix:** drop-ins en [`systemd/arranque-escalonado/`](systemd/arranque-escalonado/)
+que se instalan como `/etc/systemd/system/<app>.service.d/arranque-escalonado.conf`
+(los `.service` originales no se tocan). Cada drop-in:
+
+- borra los `sleep` (`ExecStartPre=` vacío y luego solo `pnpm build`),
+- encadena las apps con `After=`, para que compilen **una por una**:
+  `docker` → Coffee Logger → Soda Stream → Vacaciones → Boardgames → Personal Assistant
+  (con `Type=simple`, cada app espera a que la anterior termine su build),
+- sube `TimeoutStartSec` a 300 s como margen.
+
+Instalación:
+
+```bash
+cd ~/Homelab/systemd/arranque-escalonado
+for s in coffeelogger sodastreamlogger vacaciones boardgamesassistant personalassistant; do
+  sudo mkdir -p /etc/systemd/system/$s.service.d
+  sudo cp $s.conf /etc/systemd/system/$s.service.d/arranque-escalonado.conf
+done
+sudo systemctl daemon-reload
+```
+
+Verificar después del siguiente reinicio: `systemctl show <app> -p NRestarts`
+debería quedar en `0` para las 5 apps, y `systemd-analyze blame` debería
+mostrarlas una detrás de otra en vez de traslapadas.
+
 ## Roadmap
 
 - [x] Interfaz de administración web (Cockpit) + acceso a archivos (File
@@ -241,6 +283,7 @@ cambios grandes en esos datos.
       sostenidas, switch físico probado)
 - [x] Parchear `macfanctld` para que el ventilador reaccione a la
       temperatura real del CPU (`coretemp`), no solo a `applesmc`
+- [ ] Instalar el arranque escalonado de las apps (drop-ins listos en `systemd/arranque-escalonado/`) y confirmar 0 reintentos tras el reinicio
 - [ ] Cablear el switch de emergencia a la línea de poder real del Mac mini
 - [ ] Resolver el pareo de HomeKit Bridge (falla por mDNS/adaptador WiFi flaky
       — ver detalle arriba; retomar con reintento, switch Ethernet, o adaptador nuevo)
