@@ -92,8 +92,12 @@ enfriamiento; aborta a 70°C). Resultados en [`pruebas/`](pruebas/):
 
 Conclusión: la curva corregida no cambia el pico. El die sube ~18°C en
 5-10 s con solo 2 núcleos, más rápido de lo que cualquier control de fan
-puede reaccionar (ciclo de 5 s + spin-up). Eso apunta a mala transferencia
-de calor (pasta térmica de 2014 seca), no al control del fan. La curva
+puede reaccionar (ciclo de 5 s + spin-up). La pasta térmica se cambió al
+configurar el servidor (julio 2026), así que no es eso: es el
+comportamiento normal de este equipo (Haswell de bajo consumo en un
+chasis compacto de 2014, con poca masa térmica). Los picos cortos de
+60-70°C son esperables y no son sobrecalentamiento sostenido. La curva
 corregida se mantiene (con techo 55 en vez de 60, porque 46/60 era menos
-agresiva que la original arriba de ~53°C), pero el arreglo de fondo es
-cambiar la pasta térmica.
+agresiva que la original arriba de ~53°C) porque mejora la respuesta ante
+carga sostenida, y el arranque escalonado de las apps evita las ráfagas
+de builds simultáneos al reiniciar.
