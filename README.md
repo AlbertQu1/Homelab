@@ -53,6 +53,12 @@ y macOS en 80GB para uso ocasional (biblioteca de Fotos / iCloud).
     `states`. Recalcula los últimos 9 días en cada corrida porque HA purga
     `states` a los 10 (`purge_keep_days: 10`); el catálogo
     `aperturas_elementos` mapea cada `entity_id` a nombre/tipo/estancia
+    Al final, si algún sensor `binary_sensor.lumi_sg_*` (ventanas y movimiento
+    Xiaomi) quedó `unavailable`, recarga la integración `xiaomi_home` vía la API
+    de HA: después del reinicio semanal no siempre reconecta sola. Ojo: estos
+    sensores (`lumi.sensor_magnet.v2` vía la Centralita mgl03, nube Singapur)
+    no reportan en vivo, solo traen el último estado guardado en la nube al
+    recargar, así que su % de apertura todavía no es confiable
   - **Red separada para IoT** — el router principal tiene el WiFi apagado por
     seguridad, así que los dispositivos smart-home (Kasa, SwitchBot) viven en
     una red aislada del mesh Deco (`CASA_IoT`, `192.168.68.0/24`) que no ve la

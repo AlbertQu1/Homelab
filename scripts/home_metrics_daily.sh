@@ -32,6 +32,26 @@ ON CONFLICT (fecha, estancia, metrica) DO UPDATE SET
   muestras = EXCLUDED.muestras;
 EOF
 
-# Aperturas por hora (ventanas, puerta, cortinas) -> home_assistant.aperturas_horarias.
+# Aperturas por hora (ventanas, cortinas) -> home_assistant.aperturas_horarias.
 # Recalcula los ultimos 9 dias en cada corrida (HA purga states a los 10).
 psql -U albertqu -d casa -v ON_ERROR_STOP=1 -q -f /home/albertqu/scripts/aperturas_horarias.sql
+
+# Recarga la integracion Xiaomi Home si algun sensor lumi (ventanas, movimiento)
+# quedo "unavailable": tras el reinicio semanal no siempre reconecta sola.
+# No detiene el resto del script si HA no responde.
+set -a; . /home/albertqu/scripts/home_assistant.env; set +a
+caidos=$(curl -sf -m 20 -H "Authorization: Bearer $HA_TOKEN" "$HA_URL/api/states" | python3 -c '
+import json, sys
+print(sum(1 for x in json.load(sys.stdin)
+          if x["entity_id"].startswith("binary_sensor.lumi_sg_") and x["state"] == "unavailable"))
+' 2>/dev/null)
+if [ -n "$caidos" ] && [ "$caidos" -gt 0 ]; then
+  entry=$(curl -sf -m 20 -H "Authorization: Bearer $HA_TOKEN" "$HA_URL/api/config/config_entries/entry?domain=xiaomi_home" \
+    | python3 -c 'import json, sys; print(json.load(sys.stdin)[0]["entry_id"])' 2>/dev/null)
+  if [ -n "$entry" ] && curl -sf -m 60 -X POST -H "Authorization: Bearer $HA_TOKEN" \
+       "$HA_URL/api/config/config_entries/entry/$entry/reload" > /dev/null; then
+    echo "xiaomi_home recargada ($caidos sensores lumi unavailable)"
+  else
+    echo "xiaomi_home: fallo la recarga ($caidos sensores lumi unavailable)" >&2
+  fi
+fi
