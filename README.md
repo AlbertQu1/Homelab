@@ -46,7 +46,13 @@ y macOS en 80GB para uso ocasional (biblioteca de Fotos / iCloud).
     `coffee_analytics`), no en el SQLite por default. Una tabla propia
     `home_assistant.daily_summary` (+ vistas por estancia) se llena cada noche
     a las 23:55 vía `home-metrics-daily.timer`, pensada para alimentar el
-    análisis de correlación clima-consumo de café más adelante
+    análisis de correlación clima-consumo de café más adelante. La misma
+    corrida llena `home_assistant.aperturas_horarias` (`scripts/aperturas_horarias.sql`,
+    esquema en `scripts/aperturas_schema.sql`): % de tiempo abierto por hora de
+    ventanas y puerta, y posición promedio de las cortinas, a partir de
+    `states`. Recalcula los últimos 9 días en cada corrida porque HA purga
+    `states` a los 10 (`purge_keep_days: 10`); el catálogo
+    `aperturas_elementos` mapea cada `entity_id` a nombre/tipo/estancia
   - **Red separada para IoT** — el router principal tiene el WiFi apagado por
     seguridad, así que los dispositivos smart-home (Kasa, SwitchBot) viven en
     una red aislada del mesh Deco (`CASA_IoT`, `192.168.68.0/24`) que no ve la
